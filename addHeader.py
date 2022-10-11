@@ -5,7 +5,6 @@ import re
 
 import constants
 
-# class Formatter:
 FIELDNAMES = ["Date", "Detail", "Debit", "Credit", "Balance", "Category"]
 
 logger = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ class bankCsvFromatterFactory:
 
 
 class BankCsvFormatter:
-    def __init__(self, filepath, bank, month, year, exportFile):
+    def __init__(self, filepath, bank, month, year, exportFile=None):
         self.filepath = filepath
         self.exportFile = exportFile or constants.exportFileFormatter.format(month, year, bank)
         self._copyLines = None
@@ -59,7 +58,7 @@ class BankCsvFormatter:
 
 
 class AmazonCreditCardFormatter(BankCsvFormatter):
-    def __init__(self, filepath, bank, month, year, exportFile):
+    def __init__(self, filepath, bank, month, year, exportFile=None):
         BankCsvFormatter.__init__(self, filepath, bank, month, year, exportFile)
 
     def addHeader(self):
@@ -86,7 +85,7 @@ class AmazonCreditCardFormatter(BankCsvFormatter):
 
 
 class TangerineCsvFormatter(BankCsvFormatter):
-    def __init__(self, filepath, bank, month, year, exportFile):
+    def __init__(self, filepath, bank, month, year, exportFile=None):
         BankCsvFormatter.__init__(self, filepath, bank, month, year, exportFile)
 
     def addHeader(self):
@@ -117,7 +116,7 @@ class TangerineCsvFormatter(BankCsvFormatter):
 
 
 class TDCsvFormatter(BankCsvFormatter):
-    def __init__(self, filepath, bank, month, year, exportFile):
+    def __init__(self, filepath, bank, month, year, exportFile=None):
         BankCsvFormatter.__init__(self, filepath, bank, month, year, exportFile)
 
     def addHeader(self):
@@ -131,7 +130,7 @@ class TDCsvFormatter(BankCsvFormatter):
                         HEADER.Detail.name: row[1],
                         HEADER.Debit.name: row[2],
                         HEADER.Credit.name: row[3],
-                        HEADER.Balance.name: "",
+                        HEADER.Balance.name: row[4],
                     }
                 )
         return copyLines

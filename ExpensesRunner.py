@@ -7,8 +7,10 @@ Desc: Automatic Credit Card Expenses Analysis
 
 import argparse
 import logging
-import sys
 import os
+import pandas as pd
+import sys
+
 
 from addHeader import formatters
 import constants
@@ -48,6 +50,15 @@ if __name__ == "__main__":
         help="Export file path",
     )
 
+    parser.add_argument(
+        "-r",
+        "--readMode",
+        required=False,
+        default=False,
+        action="store_true",
+        help="Trigger Read mode"
+    )
+
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
@@ -67,4 +78,25 @@ if __name__ == "__main__":
             year=args.year,
             exportFile=args.export,
         )
-        formatter.write()
+
+        if not args.readMode:
+            formatter.write()
+
+        exportFile = formatter.exportFile
+        # print(exportFile)
+
+        if args.readMode and not os.path.isfile(exportFile):
+            f"{exportFile} doesn't exist yet, can't run read mode."
+            sys.exit(1)
+
+
+        print("Sums:")
+        rawData = pd.read_csv(exportFile, sep=",")
+        totalExpenses = rawData[["Debit"]].sum()
+        # print(f"Total Expanses of {constants.months[int(args.month - 1)]}: {totalExpenses}")
+        print(totalExpenses)
+
+        print("Categorize expenses now...")
+
+
+
