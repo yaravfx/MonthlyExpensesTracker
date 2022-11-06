@@ -4,7 +4,7 @@ Automatically monthly expenses writer/analyzer
 
 ## Description
 
- * csvHeader: csv formatter factory
+ * formatter: csv formatter factory
  * BankCSVRunner:  a command-line tool to read csv-file from bank then write a formatted csv with unified header
  * batchRunner: all the batch work
  * Categorizer: Analyse formatted csv files and categorize each item in the csv

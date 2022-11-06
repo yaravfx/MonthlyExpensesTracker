@@ -1,6 +1,7 @@
 """csv formatter factories"""
 
 import csv
+from datetime import datetime
 from enum import Enum
 import logging
 import os
@@ -63,6 +64,20 @@ class BankCsvFormatter:
             for line in self.copyLines:
                 writer.writerow(line)
 
+    def getDate(self, dateStr):
+        date_split = dateStr.split("/")
+        if len(date_split) != 3:
+            date_split = dateStr.split("-")
+
+        if len(date_split) != 3:
+            raise RuntimeError(f"Error getting date from {dateStr}")
+
+        month, date, year = date_split
+
+        date = datetime(int(year), int(month), int(date))
+        newDateStr = date.strftime("%m-%d-%Y")
+        return newDateStr
+
 
 class AmazonCreditCardFormatter(BankCsvFormatter):
     def __init__(self, filepath, bank, month, year, exportFile=None):
@@ -79,9 +94,10 @@ class AmazonCreditCardFormatter(BankCsvFormatter):
                     credit = row[3]
                 else:
                     debit = abs(float(row[3]))
+                date = self.getDate(row[0])
                 copyLines.append(
                     {
-                        HEADER.Date.name: row[0],
+                        HEADER.Date.name: date,
                         HEADER.Detail.name: row[1],
                         HEADER.Debit.name: debit,
                         HEADER.Credit.name: credit,
@@ -109,9 +125,10 @@ class TangerineCsvFormatter(BankCsvFormatter):
                 if "Category:" in row[3]:
                     category = re.findall("Category:\s(.*)", row[3])[0]
 
+                date = self.getDate(row[0])
                 copyLines.append(
                     {
-                        HEADER.Date.name: row[0],
+                        HEADER.Date.name: date,
                         HEADER.Detail.name: row[2],
                         HEADER.Debit.name: debit,
                         HEADER.Credit.name: credit,
@@ -131,9 +148,10 @@ class TDCsvFormatter(BankCsvFormatter):
             reader = csv.reader(csvfile, delimiter=",")
             copyLines = []
             for row in reader:
+                date = self.getDate(row[0])
                 copyLines.append(
                     {
-                        HEADER.Date.name: row[0],
+                        HEADER.Date.name: date,
                         HEADER.Detail.name: row[1],
                         HEADER.Debit.name: row[2],
                         HEADER.Credit.name: row[3],
