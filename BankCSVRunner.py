@@ -1,7 +1,8 @@
 """
 Author: Yara
 Date: 2022-10-09
-Desc: Automatic Credit Card Expenses Analysis
+Desc: A command-line tool to read csv-file from bank,
+then write a formatted csv with unified header
 """
 
 
@@ -13,7 +14,11 @@ import sys
 
 
 from addHeader import formatters
+from batchRunner import runner
 import constants
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 
 if __name__ == "__main__":
@@ -21,6 +26,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="ExpensesRunner",
         description="My very own automatic credit card expenses analysis",
+    )
+    parser.add_argument(
+        "--batch",
+        required=False,
+        default=False,
+        action="store_true",
+        help="batch running on all the files in the directory of inputPath"
     )
 
     parser.add_argument(
@@ -64,6 +76,12 @@ if __name__ == "__main__":
         sys.exit(1)
 
     args = parser.parse_args()
+    if args.batch:
+        _dir = os.path.dirname(args.inputPath)
+        runner(_dir)
+        print("Batch runner done.")
+        sys.exit(0)
+
     try:
         _formatter = formatters.get_formatter(args.bank)
     except ValueError:

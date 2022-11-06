@@ -1,6 +1,9 @@
+"""csv formatter factories"""
+
 import csv
 from enum import Enum
 import logging
+import os
 import re
 
 import constants
@@ -36,7 +39,11 @@ class bankCsvFromatterFactory:
 class BankCsvFormatter:
     def __init__(self, filepath, bank, month, year, exportFile=None):
         self.filepath = filepath
-        self.exportFile = exportFile or constants.exportFileFormatter.format(month, year, bank)
+        _exportDir = os.path.dirname(self.filepath) + "_new"
+        if not os.path.isdir(_exportDir):
+            os.mkdir(_exportDir)
+        _exportFilePath = os.path.join(_exportDir, constants.exportFileNameFormatter.format(month, year, bank))
+        self.exportFile = exportFile or _exportFilePath
         self._copyLines = None
 
     def addHeader(self):
@@ -139,7 +146,7 @@ class TDCsvFormatter(BankCsvFormatter):
 formatters = bankCsvFromatterFactory()
 formatters.register_format("amazon", AmazonCreditCardFormatter)
 formatters.register_format("tangerine", TangerineCsvFormatter)
-formatters.register_format("TD", TDCsvFormatter)
+formatters.register_format("td_visa", TDCsvFormatter)
 
 
 
